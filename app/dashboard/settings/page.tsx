@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ExternalLink, ChevronRight, Bell, Globe, CreditCard, Sliders } from "lucide-react";
+import { Check, ExternalLink, ChevronRight, Bell, Globe, CreditCard, Sliders, Store } from "lucide-react";
+import { useBusinessType, type BusinessType } from "@/lib/business-type-context";
 
-const tabs = ["Business Profile", "Integrations", "Notifications", "Billing", "Custom Fields"];
+const tabs = ["Business Profile", "Business Type", "Integrations", "Notifications", "Billing", "Custom Fields"];
 
 const integrations = [
   { name: "WhatsApp Business", icon: "💬", status: "connected", description: "Sending & receiving messages via Meta API", badge: "1,000 free/mo" },
@@ -26,8 +27,43 @@ const invoices = [
   { date: "1 Apr 2025", amount: "R259.00", plan: "GROW", status: "paid" },
 ];
 
+const BIZ_TYPE_OPTIONS: { id: BusinessType; icon: string; title: string; subtitle: string; tabs: string; pipeLine: string }[] = [
+  {
+    id: "services",
+    icon: "🛠️",
+    title: "Service Business",
+    subtitle: "Appointments, consultations, bookings, and service delivery.",
+    tabs: "Bookings, Automations, Calendar, Funnels, Forms",
+    pipeLine: "New Lead → Contacted → Interested → Booked → Won",
+  },
+  {
+    id: "products",
+    icon: "📦",
+    title: "Product / eCommerce",
+    subtitle: "Physical or digital products, online orders, inventory management.",
+    tabs: "Orders, Inventory, Funnels, Forms, Automations",
+    pipeLine: "New Inquiry → Quoted → Confirmed → Packing → Shipped → Delivered",
+  },
+  {
+    id: "both",
+    icon: "🏪",
+    title: "Products + Services",
+    subtitle: "Sell both products and services (e.g., beauty salon that also sells hair products).",
+    tabs: "All tabs unlocked — Bookings, Orders, Inventory, and more",
+    pipeLine: "Switch between Sales Pipeline and Order Pipeline",
+  },
+];
+
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("Business Profile");
+  const { businessType, setBusinessType } = useBusinessType();
+  const [bizTypeSaved, setBizTypeSaved] = useState(false);
+
+  const handleSaveBizType = () => {
+    setBizTypeSaved(true);
+    setTimeout(() => setBizTypeSaved(false), 2000);
+  };
+
   const [form, setForm] = useState({
     businessName: "Cape Town Dental Studio",
     phone: "+27 21 555 1234",
@@ -47,13 +83,14 @@ export default function SettingsPage() {
       <div className="w-52 shrink-0">
         <div className="bg-white rounded-2xl border border-[#E2E8F0] p-2">
           {tabs.map((t) => {
-            const icons: Record<string, typeof Bell> = { "Integrations": Globe, "Notifications": Bell, "Billing": CreditCard, "Custom Fields": Sliders };
+            const icons: Record<string, typeof Bell> = { "Business Type": Store, "Integrations": Globe, "Notifications": Bell, "Billing": CreditCard, "Custom Fields": Sliders };
             const Icon = icons[t];
             return (
               <button key={t} onClick={() => setActiveTab(t)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-left transition-colors ${activeTab === t ? "bg-[#E8F5EE] text-[#0D7A4E]" : "text-[#64748B] hover:bg-[#F1F5F9]"}`}>
                 {Icon && <Icon size={15} />}
                 {t}
+                {t === "Business Type" && <span className="ml-auto text-[9px] font-bold bg-[#E8F5EE] text-[#0D7A4E] px-1.5 py-0.5 rounded-full">NEW</span>}
               </button>
             );
           })}
@@ -108,6 +145,74 @@ export default function SettingsPage() {
                 <span className="text-[#64748B]">.khulacr m.co.za</span>
                 <button className="ml-auto"><ExternalLink size={14} className="text-[#94A3B8]" /></button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "Business Type" && (
+          <div className="space-y-5">
+            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h3 className="font-bold text-[#1E293B] text-lg">Business Type</h3>
+                  <p className="text-sm text-[#64748B] mt-0.5">This changes which tabs, features, and pipeline stages are shown across the entire CRM.</p>
+                </div>
+                <button
+                  onClick={handleSaveBizType}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${bizTypeSaved ? "bg-[#DCFCE7] text-[#16A34A]" : "bg-[#0D7A4E] text-white hover:bg-[#065A38]"}`}
+                >
+                  {bizTypeSaved ? <><Check size={14} /> Saved!</> : "Save Changes"}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 mt-6">
+                {BIZ_TYPE_OPTIONS.map((opt) => {
+                  const selected = businessType === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      onClick={() => setBusinessType(opt.id)}
+                      className={`w-full text-left p-5 rounded-2xl border-2 transition-all ${selected ? "border-[#0D7A4E] bg-[#E8F5EE]" : "border-[#E2E8F0] hover:border-[#A7D7BF] bg-white"}`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 ${selected ? "bg-[#0D7A4E]/10" : "bg-[#F8FAFC]"}`}>
+                          {opt.icon}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className="font-bold text-[#1E293B]">{opt.title}</span>
+                            {selected && (
+                              <span className="flex items-center gap-1 text-[10px] font-bold bg-[#0D7A4E] text-white px-2 py-0.5 rounded-full">
+                                <Check size={9} /> Active
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-[#64748B] mb-3">{opt.subtitle}</p>
+                          <div className="space-y-1.5">
+                            <div className="flex items-start gap-2 text-xs">
+                              <span className="font-semibold text-[#374151] shrink-0">Tabs shown:</span>
+                              <span className="text-[#64748B]">{opt.tabs}</span>
+                            </div>
+                            <div className="flex items-start gap-2 text-xs">
+                              <span className="font-semibold text-[#374151] shrink-0">Pipeline:</span>
+                              <span className="text-[#64748B]">{opt.pipeLine}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className={`w-5 h-5 rounded-full border-2 shrink-0 mt-1 flex items-center justify-center ${selected ? "border-[#0D7A4E] bg-[#0D7A4E]" : "border-[#CBD5E1]"}`}>
+                          {selected && <div className="w-2 h-2 rounded-full bg-white" />}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="bg-[#E8F5EE] rounded-2xl border border-[#A7D7BF] p-5">
+              <p className="text-sm text-[#065A38] font-medium">
+                💡 <strong>Changes take effect immediately</strong> — the sidebar updates as soon as you select a type. No need to refresh. You can switch between types at any time without losing any data.
+              </p>
             </div>
           </div>
         )}

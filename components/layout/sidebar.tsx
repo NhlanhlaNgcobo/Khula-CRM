@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Kanban, Inbox, Calendar,
   Zap, FileText, BarChart3, UserCheck, Settings, LogOut,
-  ChevronRight, Filter, Megaphone, Globe, Sparkles, MessageCircle
+  ChevronRight, Filter, Megaphone, Globe, Sparkles, MessageCircle,
+  ShoppingCart, Package, MonitorSmartphone,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { useBusinessType } from "@/lib/business-type-context";
 import type { LucideIcon } from "lucide-react";
 
 type NavItem = {
@@ -19,55 +21,66 @@ type NavItem = {
   isNew?: boolean;
 };
 
-const navGroups: { label: string; items: NavItem[] }[] = [
-  {
-    label: "Core",
-    items: [
-      { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", exact: true },
-      { href: "/dashboard/contacts", icon: Users, label: "Contacts" },
-      { href: "/dashboard/pipeline", icon: Kanban, label: "Pipeline" },
-    ],
-  },
-  {
-    label: "Conversations",
-    items: [
-      { href: "/dashboard/unibox", icon: Inbox, label: "Unibox", badge: 9, isNew: true },
-      { href: "/dashboard/whatsapp", icon: MessageCircle, label: "WhatsApp", isNew: true },
-    ],
-  },
-  {
-    label: "Convert",
-    items: [
-      { href: "/dashboard/funnels", icon: Filter, label: "Funnels", isNew: true },
-      { href: "/dashboard/bookings", icon: Calendar, label: "Bookings" },
-      { href: "/dashboard/forms", icon: FileText, label: "Forms" },
-      { href: "/dashboard/automations", icon: Zap, label: "Automations" },
-    ],
-  },
-  {
-    label: "Grow",
-    items: [
-      { href: "/dashboard/ads", icon: Megaphone, label: "Ads", isNew: true },
-      { href: "/dashboard/social", icon: Globe, label: "Social Hub", isNew: true },
-      { href: "/dashboard/analytics", icon: BarChart3, label: "Analytics" },
-    ],
-  },
-  {
-    label: "Manage",
-    items: [
-      { href: "/dashboard/team", icon: UserCheck, label: "Team" },
-      { href: "/dashboard/settings", icon: Settings, label: "Settings" },
-    ],
-  },
-];
+type NavGroup = { label: string; items: NavItem[] };
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { businessType } = useBusinessType();
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href;
     return pathname.startsWith(href);
   };
+
+  const showServices = businessType === "services" || businessType === "both";
+  const showProducts = businessType === "products" || businessType === "both";
+
+  const convertItems: NavItem[] = [
+    { href: "/dashboard/funnels", icon: Filter, label: "Funnels", isNew: true },
+    ...(showServices ? [{ href: "/dashboard/bookings", icon: Calendar, label: "Bookings" }] : []),
+    ...(showProducts ? [{ href: "/dashboard/orders", icon: ShoppingCart, label: "Orders", isNew: true }] : []),
+    ...(showProducts ? [{ href: "/dashboard/inventory", icon: Package, label: "Inventory", isNew: true }] : []),
+    { href: "/dashboard/forms", icon: FileText, label: "Forms" },
+    { href: "/dashboard/automations", icon: Zap, label: "Automations" },
+  ];
+
+  const navGroups: NavGroup[] = [
+    {
+      label: "Core",
+      items: [
+        { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", exact: true },
+        { href: "/dashboard/contacts", icon: Users, label: "Contacts" },
+        { href: "/dashboard/pipeline", icon: Kanban, label: "Pipeline" },
+      ],
+    },
+    {
+      label: "Conversations",
+      items: [
+        { href: "/dashboard/unibox", icon: Inbox, label: "Unibox", badge: 9, isNew: true },
+        { href: "/dashboard/whatsapp", icon: MessageCircle, label: "WhatsApp", isNew: true },
+      ],
+    },
+    {
+      label: "Convert",
+      items: convertItems,
+    },
+    {
+      label: "Grow",
+      items: [
+        { href: "/dashboard/ads", icon: Megaphone, label: "Ads", isNew: true },
+        { href: "/dashboard/social", icon: Globe, label: "Social Hub", isNew: true },
+        { href: "/dashboard/website", icon: MonitorSmartphone, label: "Website", isNew: true },
+        { href: "/dashboard/analytics", icon: BarChart3, label: "Analytics" },
+      ],
+    },
+    {
+      label: "Manage",
+      items: [
+        { href: "/dashboard/team", icon: UserCheck, label: "Team" },
+        { href: "/dashboard/settings", icon: Settings, label: "Settings" },
+      ],
+    },
+  ];
 
   return (
     <aside className="w-60 shrink-0 bg-[#0D7A4E] flex flex-col h-full overflow-hidden">
@@ -80,11 +93,14 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Plan badge */}
-      <div className="px-5 py-2.5 border-b border-[#0FA863]/40">
+      {/* Plan + business type badges */}
+      <div className="px-5 py-2.5 border-b border-[#0FA863]/40 flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-[#0FA863]/30 text-[#A7D7BF] px-2.5 py-1 rounded-full">
           <span className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></span>
           GROW Plan
+        </span>
+        <span className="text-[9px] font-bold uppercase tracking-wider text-[#4ADE80] bg-[#0FA863]/20 px-2 py-0.5 rounded-full truncate">
+          {businessType === "services" ? "Services" : businessType === "products" ? "Products" : "Both"}
         </span>
       </div>
 

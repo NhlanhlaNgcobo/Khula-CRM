@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { useBusinessType } from "@/lib/business-type-context";
 
 const revenueData = [
   { week: "W1", won: 8500, pipeline: 45000 },
@@ -50,8 +51,42 @@ const automationPerf = [
   { name: "30-Day Re-Engagement", runs: 34, conversions: 9, rate: "26%" },
 ];
 
+const orderData = [
+  { week: "W1", orders: 18, revenue: 8200 },
+  { week: "W2", orders: 24, revenue: 11400 },
+  { week: "W3", orders: 31, revenue: 14900 },
+  { week: "W4", orders: 28, revenue: 13100 },
+];
+
+const productFunnel = [
+  { stage: "Visited Store",    count: 820, color: "#3B82F6" },
+  { stage: "Viewed Product",   count: 410, color: "#F59E0B" },
+  { stage: "Added to Cart",    count: 180, color: "#F97316" },
+  { stage: "Started Checkout", count: 94,  color: "#8B5CF6" },
+  { stage: "Completed Order",  count: 72,  color: "#10B981" },
+];
+
+const topProducts = [
+  { name: "Moisturising Shampoo 400ml", units: 38, revenue: "R3,610",  trend: "up"   },
+  { name: "Curl Defining Cream 250ml",  units: 31, revenue: "R5,735",  trend: "up"   },
+  { name: "Deep Conditioner 500ml",     units: 27, revenue: "R4,455",  trend: "up"   },
+  { name: "Growth Serum 60ml",          units: 14, revenue: "R3,920",  trend: "down" },
+  { name: "Scalp Spray 200ml",          units: 11, revenue: "R2,695",  trend: "up"   },
+];
+
+const repeatData = [
+  { month: "Feb", new: 28, returning: 12 },
+  { month: "Mar", new: 32, returning: 18 },
+  { month: "Apr", new: 25, returning: 24 },
+  { month: "May", new: 29, returning: 31 },
+  { month: "Jun", new: 22, returning: 38 },
+];
+
 export default function AnalyticsPage() {
   const [range, setRange] = useState("30");
+  const { businessType } = useBusinessType();
+  const isProducts = businessType === "products";
+  const showBoth = businessType === "both";
 
   return (
     <div className="space-y-5">
@@ -68,12 +103,17 @@ export default function AnalyticsPage() {
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        {[
-          { label: "Total Revenue", value: "R48,250", sub: "+22% vs last month", icon: TrendingUp, color: "#0D7A4E", bg: "#E8F5EE" },
-          { label: "Leads Generated", value: "94", sub: "+15 vs last month", icon: TrendingUp, color: "#3B82F6", bg: "#EFF6FF" },
-          { label: "Avg Deal Value", value: "R5,194", sub: "+R420 vs last month", icon: TrendingUp, color: "#8B5CF6", bg: "#F5F3FF" },
-          { label: "Churn (Closed Lost)", value: "6", sub: "-2 vs last month", icon: TrendingDown, color: "#10B981", bg: "#D1FAE5" },
-        ].map((k) => (
+        {(isProducts ? [
+          { label: "Total Revenue",     value: "R47,600", sub: "+18% vs last month",  icon: TrendingUp,   color: "#0D7A4E", bg: "#E8F5EE" },
+          { label: "Orders This Month", value: "101",     sub: "+24 vs last month",   icon: TrendingUp,   color: "#3B82F6", bg: "#EFF6FF" },
+          { label: "Avg Order Value",   value: "R471",    sub: "+R38 vs last month",  icon: TrendingUp,   color: "#8B5CF6", bg: "#F5F3FF" },
+          { label: "Repeat Buyers",     value: "62%",     sub: "+8% vs last month",   icon: TrendingUp,   color: "#10B981", bg: "#D1FAE5" },
+        ] : [
+          { label: "Total Revenue",      value: "R48,250", sub: "+22% vs last month", icon: TrendingUp,   color: "#0D7A4E", bg: "#E8F5EE" },
+          { label: "Leads Generated",    value: "94",      sub: "+15 vs last month",  icon: TrendingUp,   color: "#3B82F6", bg: "#EFF6FF" },
+          { label: "Avg Deal Value",     value: "R5,194",  sub: "+R420 vs last month",icon: TrendingUp,   color: "#8B5CF6", bg: "#F5F3FF" },
+          { label: "Churn (Closed Lost)",value: "6",       sub: "-2 vs last month",   icon: TrendingDown, color: "#10B981", bg: "#D1FAE5" },
+        ]).map((k) => (
           <div key={k.label} className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
             <div className="flex items-start justify-between mb-3">
               <div className="p-2.5 rounded-xl" style={{ background: k.bg }}>
@@ -90,30 +130,42 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
         {/* Revenue chart */}
         <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
-          <h3 className="font-semibold text-[#1E293B] mb-4">Revenue Over Time</h3>
+          <h3 className="font-semibold text-[#1E293B] mb-4">{isProducts ? "Orders & Revenue Over Time" : "Revenue Over Time"}</h3>
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={revenueData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-              <XAxis dataKey="week" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `R${(v/1000).toFixed(0)}K`} />
-              <Tooltip formatter={(v) => [`R${Number(v).toLocaleString()}`, ""]} />
-              <Line type="monotone" dataKey="won" stroke="#0D7A4E" strokeWidth={2.5} dot={{ fill: "#0D7A4E", r: 4 }} name="Closed Won" />
-              <Line type="monotone" dataKey="pipeline" stroke="#3B82F6" strokeWidth={2} strokeDasharray="5 5" dot={false} name="Pipeline" />
-            </LineChart>
+            {isProducts ? (
+              <BarChart data={orderData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                <XAxis dataKey="week" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                <YAxis yAxisId="left" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `R${(v/1000).toFixed(0)}K`} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Bar yAxisId="left"  dataKey="revenue" fill="#0D7A4E" name="Revenue" radius={[4,4,0,0]} />
+                <Bar yAxisId="right" dataKey="orders"  fill="#3B82F6" name="Orders"  radius={[4,4,0,0]} opacity={0.7} />
+              </BarChart>
+            ) : (
+              <LineChart data={revenueData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                <XAxis dataKey="week" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `R${(v/1000).toFixed(0)}K`} />
+                <Tooltip formatter={(v) => [`R${Number(v).toLocaleString()}`, ""]} />
+                <Line type="monotone" dataKey="won" stroke="#0D7A4E" strokeWidth={2.5} dot={{ fill: "#0D7A4E", r: 4 }} name="Closed Won" />
+                <Line type="monotone" dataKey="pipeline" stroke="#3B82F6" strokeWidth={2} strokeDasharray="5 5" dot={false} name="Pipeline" />
+              </LineChart>
+            )}
           </ResponsiveContainer>
         </div>
 
-        {/* Pipeline funnel */}
+        {/* Pipeline or Product funnel */}
         <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
-          <h3 className="font-semibold text-[#1E293B] mb-4">Pipeline Funnel</h3>
+          <h3 className="font-semibold text-[#1E293B] mb-4">{isProducts ? "eCommerce Funnel" : "Pipeline Funnel"}</h3>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={pipelineFunnel} layout="vertical">
+            <BarChart data={isProducts ? productFunnel : pipelineFunnel} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
               <XAxis type="number" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="stage" type="category" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={80} />
+              <YAxis dataKey="stage" type="category" tick={{ fontSize: 11, fill: "#64748B" }} axisLine={false} tickLine={false} width={100} />
               <Tooltip />
               <Bar dataKey="count" radius={[0, 6, 6, 0]}>
-                {pipelineFunnel.map((entry, index) => (
+                {(isProducts ? productFunnel : pipelineFunnel).map((entry, index) => (
                   <Cell key={index} fill={entry.color} />
                 ))}
               </Bar>
@@ -121,48 +173,91 @@ export default function AnalyticsPage() {
           </ResponsiveContainer>
         </div>
 
-        {/* Bookings chart */}
-        <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
-          <h3 className="font-semibold text-[#1E293B] mb-4">Bookings This Week</h3>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={bookingData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-              <XAxis dataKey="day" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-              <Tooltip />
-              <Bar dataKey="completed" fill="#0D7A4E" stackId="a" name="Completed" radius={[0,0,0,0]} />
-              <Bar dataKey="no_show" fill="#EF4444" stackId="a" name="No-Show" />
-              <Bar dataKey="cancelled" fill="#CBD5E1" stackId="a" name="Cancelled" radius={[4,4,0,0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        {/* Bookings or Orders chart */}
+        {isProducts ? (
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
+            <h3 className="font-semibold text-[#1E293B] mb-4">New vs Returning Buyers</h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={repeatData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Bar dataKey="new"       fill="#3B82F6" stackId="a" name="New Buyers"       radius={[0,0,0,0]} />
+                <Bar dataKey="returning" fill="#0D7A4E" stackId="a" name="Repeat Buyers"    radius={[4,4,0,0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
+            <h3 className="font-semibold text-[#1E293B] mb-4">Bookings This Week</h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={bookingData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                <XAxis dataKey="day" tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Bar dataKey="completed" fill="#0D7A4E" stackId="a" name="Completed" radius={[0,0,0,0]} />
+                <Bar dataKey="no_show" fill="#EF4444" stackId="a" name="No-Show" />
+                <Bar dataKey="cancelled" fill="#CBD5E1" stackId="a" name="Cancelled" radius={[4,4,0,0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
-        {/* Lead source */}
-        <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
-          <h3 className="font-semibold text-[#1E293B] mb-4">Lead Source Performance</h3>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#E2E8F0]">
-                {["Source", "Leads", "Conv.", "Revenue"].map((h) => (
-                  <th key={h} className="pb-2 text-left text-xs font-semibold text-[#94A3B8]">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {sourceData.map((s) => (
-                <tr key={s.source} className="border-b border-[#F1F5F9] last:border-0">
-                  <td className="py-2.5 font-medium text-[#1E293B] flex items-center gap-2">
-                    {s.trend === "up" ? <TrendingUp size={12} className="text-[#10B981]" /> : <TrendingDown size={12} className="text-[#EF4444]" />}
-                    {s.source}
-                  </td>
-                  <td className="py-2.5 text-[#64748B]">{s.leads}</td>
-                  <td className="py-2.5 text-[#64748B]">{s.conversion}</td>
-                  <td className="py-2.5 font-semibold text-[#1E293B]">{s.revenue}</td>
+        {/* Lead source or Top Products */}
+        {isProducts ? (
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
+            <h3 className="font-semibold text-[#1E293B] mb-4">Top Products (30 days)</h3>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#E2E8F0]">
+                  {["Product", "Units", "Revenue", ""].map((h) => (
+                    <th key={h} className="pb-2 text-left text-xs font-semibold text-[#94A3B8]">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {topProducts.map((p) => (
+                  <tr key={p.name} className="border-b border-[#F1F5F9] last:border-0">
+                    <td className="py-2.5 font-medium text-[#1E293B] text-xs max-w-[160px] truncate">{p.name}</td>
+                    <td className="py-2.5 text-[#64748B] text-xs">{p.units}</td>
+                    <td className="py-2.5 font-semibold text-[#1E293B] text-xs">{p.revenue}</td>
+                    <td className="py-2.5">
+                      {p.trend === "up" ? <TrendingUp size={12} className="text-[#10B981]" /> : <TrendingDown size={12} className="text-[#EF4444]" />}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
+            <h3 className="font-semibold text-[#1E293B] mb-4">Lead Source Performance</h3>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#E2E8F0]">
+                  {["Source", "Leads", "Conv.", "Revenue"].map((h) => (
+                    <th key={h} className="pb-2 text-left text-xs font-semibold text-[#94A3B8]">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sourceData.map((s) => (
+                  <tr key={s.source} className="border-b border-[#F1F5F9] last:border-0">
+                    <td className="py-2.5 font-medium text-[#1E293B] flex items-center gap-2">
+                      {s.trend === "up" ? <TrendingUp size={12} className="text-[#10B981]" /> : <TrendingDown size={12} className="text-[#EF4444]" />}
+                      {s.source}
+                    </td>
+                    <td className="py-2.5 text-[#64748B]">{s.leads}</td>
+                    <td className="py-2.5 text-[#64748B]">{s.conversion}</td>
+                    <td className="py-2.5 font-semibold text-[#1E293B]">{s.revenue}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
@@ -172,7 +267,7 @@ export default function AnalyticsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#E2E8F0]">
-                {["Member", "Deals", "Bookings", "Revenue", "Conv."].map((h) => (
+                {["Member", isProducts ? "Orders" : "Deals", isProducts ? "Fulfilled" : "Bookings", "Revenue", "Conv."].map((h) => (
                   <th key={h} className="pb-2 text-left text-xs font-semibold text-[#94A3B8]">{h}</th>
                 ))}
               </tr>
