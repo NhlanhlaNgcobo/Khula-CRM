@@ -1,10 +1,10 @@
-import { TrendingUp, Users, Calendar, Target, CheckCircle, Circle, ArrowRight, Zap } from "lucide-react";
+import { TrendingUp, Users, Calendar, Target, CheckCircle, Circle, Zap } from "lucide-react";
 
 const stats = [
-  { label: "Today's Leads", value: "7", change: "+3 vs yesterday", icon: Users, color: "#3B82F6", bg: "#EFF6FF" },
-  { label: "Pipeline Value", value: "R284,500", change: "12 open deals", icon: TrendingUp, color: "#0D7A4E", bg: "#E8F5EE" },
-  { label: "Bookings This Week", value: "23", change: "4 today", icon: Calendar, color: "#8B5CF6", bg: "#F5F3FF" },
-  { label: "Conversion Rate", value: "34%", change: "+2% this month", icon: Target, color: "#F59E0B", bg: "#FFFBEB" },
+  { label: "Today's Leads", value: "7", change: "+3 vs yesterday", icon: Users, color: "#3B82F6" },
+  { label: "Pipeline Value", value: "R284,500", change: "12 open deals", icon: TrendingUp, color: "#F5A623" },
+  { label: "Bookings This Week", value: "23", change: "4 today", icon: Calendar, color: "#8B5CF6" },
+  { label: "Conversion Rate", value: "34%", change: "+2% this month", icon: Target, color: "#0D7A4E" },
 ];
 
 const onboardingSteps = [
@@ -73,16 +73,18 @@ export default function DashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
         {stats.map((s) => (
-          <div key={s.label} className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
-            <div className="flex items-start justify-between mb-3">
-              <div className="p-2.5 rounded-xl" style={{ background: s.bg }}>
-                <s.icon size={18} style={{ color: s.color }} />
-              </div>
-              <ArrowRight size={14} className="text-[#CBD5E1]" />
+          <div
+            key={s.label}
+            className="bg-white rounded-2xl border border-[#E2E8F0] p-5 overflow-hidden relative"
+            style={{ borderLeft: `3px solid ${s.color}` }}
+          >
+            {/* Watermark icon */}
+            <div className="absolute -bottom-2 -right-2 opacity-[0.07] pointer-events-none">
+              <s.icon size={72} style={{ color: s.color }} />
             </div>
-            <div className="text-2xl font-bold text-[#1E293B]">{s.value}</div>
-            <div className="text-sm text-[#64748B] mt-0.5">{s.label}</div>
-            <div className="text-xs text-[#0D7A4E] font-medium mt-1">{s.change}</div>
+            <div className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: s.color }}>{s.label}</div>
+            <div className="text-[2.5rem] font-black leading-none text-[#1E293B]">{s.value}</div>
+            <div className="text-xs font-semibold mt-3" style={{ color: s.color }}>{s.change}</div>
           </div>
         ))}
       </div>
@@ -152,25 +154,34 @@ export default function DashboardPage() {
       </div>
 
       {/* Revenue this month */}
-      <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-[#1E293B]">Revenue This Month</h3>
-          <span className="text-[#64748B] text-sm">June 2025</span>
-        </div>
-        <div className="flex items-end gap-6">
-          <div>
-            <div className="text-3xl font-bold text-[#1E293B]">R48,250</div>
-            <div className="text-sm text-[#0D7A4E] font-medium">+22% vs last month</div>
-          </div>
-          <div className="flex-1">
-            <div className="flex items-end gap-2 h-16">
-              {[60, 40, 80, 55, 90, 70, 100, 65, 85, 75, 95, 110].map((h, i) => (
-                <div key={i} className="flex-1 rounded-t-md transition-all hover:opacity-80" style={{ height: `${h}%`, background: i === 11 ? "#0D7A4E" : "#E8F5EE" }}></div>
-              ))}
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden" style={{ borderLeft: "3px solid #F5A623" }}>
+        <div className="p-5">
+          <div className="flex items-end justify-between mb-5">
+            <div>
+              <div className="text-[9px] font-black uppercase tracking-widest text-[#F5A623] mb-2">Revenue This Month</div>
+              <div className="text-[2.75rem] font-black leading-none text-[#1E293B]">R48,250</div>
+              <div className="text-sm text-[#0D7A4E] font-semibold mt-2">+22% vs last month</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[9px] font-black uppercase tracking-widest text-[#94A3B8] mb-1">Target</div>
+              <div className="text-xl font-black text-[#94A3B8]">R60,000</div>
+              <div className="text-xs text-[#CBD5E1] mt-1">80% achieved</div>
             </div>
           </div>
+          <div className="flex items-end gap-1.5 h-16">
+            {[60, 40, 80, 55, 90, 70, 100, 65, 85, 75, 95, 110].map((h, i) => (
+              <div
+                key={i}
+                className="flex-1 rounded-t transition-all hover:opacity-75"
+                style={{ height: `${h}%`, background: i === 11 ? "#F5A623" : i >= 9 ? "#0D7A4E" : "#E8F5EE" }}
+              ></div>
+            ))}
+          </div>
+          <div className="flex justify-between mt-2 text-[9px] text-[#CBD5E1]">
+            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+            <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+          </div>
         </div>
-        <div className="mt-2 text-xs text-[#94A3B8] text-right">Target: R60,000</div>
       </div>
     </div>
   );

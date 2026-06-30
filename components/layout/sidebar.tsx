@@ -83,23 +83,23 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="w-60 shrink-0 bg-[#0D7A4E] flex flex-col h-full overflow-hidden">
+    <aside className="w-60 shrink-0 bg-[#0B1F14] flex flex-col h-full overflow-hidden">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-[#0FA863]/40">
+      <div className="px-5 py-5 border-b border-white/8">
         <Logo size="sm" variant="light" />
         <div className="mt-2 flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-[#4ADE80] animate-pulse"></div>
-          <span className="text-[10px] text-[#A7D7BF] font-medium truncate">Cape Town Dental Studio</span>
+          <span className="text-[10px] text-white/60 font-medium truncate">Cape Town Dental Studio</span>
         </div>
       </div>
 
       {/* Plan + business type badges */}
-      <div className="px-5 py-2.5 border-b border-[#0FA863]/40 flex items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-[#0FA863]/30 text-[#A7D7BF] px-2.5 py-1 rounded-full">
+      <div className="px-5 py-2.5 border-b border-white/8 flex items-center justify-between gap-2">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider bg-white/8 text-white/60 px-2.5 py-1 rounded-full">
           <span className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></span>
           GROW Plan
         </span>
-        <span className="text-[9px] font-bold uppercase tracking-wider text-[#4ADE80] bg-[#0FA863]/20 px-2 py-0.5 rounded-full truncate">
+        <span className="text-[9px] font-bold uppercase tracking-wider text-[#4ADE80] bg-[#4ADE80]/15 px-2 py-0.5 rounded-full truncate">
           {businessType === "services" ? "Services" : businessType === "products" ? "Products" : "Both"}
         </span>
       </div>
@@ -108,7 +108,7 @@ export function Sidebar() {
       <nav className="flex-1 px-3 py-3 overflow-y-auto space-y-4">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="text-[9px] font-bold uppercase tracking-widest text-[#0FA863]/70 px-3 mb-1.5">{group.label}</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 px-3 mb-1.5">{group.label}</p>
             <div className="space-y-0.5">
               {group.items.map(({ href, icon: Icon, label, badge, exact, isNew }) => {
                 const active = isActive(href, exact);
@@ -117,10 +117,10 @@ export function Sidebar() {
                     key={href}
                     href={href}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative ${
-                      active ? "bg-white/15 text-white" : "text-[#A7D7BF] hover:bg-white/10 hover:text-white"
+                      active ? "bg-[#0D7A4E] text-white" : "text-white/50 hover:bg-white/8 hover:text-white"
                     }`}
                   >
-                    <Icon size={16} className={active ? "text-white" : "text-[#A7D7BF] group-hover:text-white"} />
+                    <Icon size={16} className={active ? "text-white" : "text-white/40 group-hover:text-white"} />
                     <span className="flex-1 truncate">{label}</span>
                     {isNew && !badge && (
                       <span className="text-[9px] font-bold bg-[#4ADE80] text-[#065A38] px-1.5 py-0.5 rounded-full shrink-0">NEW</span>
@@ -141,24 +141,24 @@ export function Sidebar() {
 
       {/* AI badge */}
       <div className="px-4 pb-3">
-        <div className="flex items-center gap-2 bg-[#0FA863]/20 rounded-xl px-3 py-2.5">
+        <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5">
           <Sparkles size={13} className="text-[#4ADE80]" />
           <div>
             <p className="text-[10px] font-bold text-white">Claude AI Active</p>
-            <p className="text-[9px] text-[#A7D7BF]">Sonnet 4.6 · Smart replies on</p>
+            <p className="text-[9px] text-white/40">Sonnet 4.6 · Smart replies on</p>
           </div>
         </div>
       </div>
 
       {/* User info */}
-      <div className="px-3 pb-4 border-t border-[#0FA863]/40 pt-3">
-        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/10 cursor-pointer group transition-colors">
-          <div className="w-7 h-7 rounded-full bg-[#0FA863]/40 flex items-center justify-center text-white font-bold text-[10px] shrink-0">SD</div>
+      <div className="px-3 pb-4 border-t border-white/8 pt-3">
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/8 cursor-pointer group transition-colors">
+          <div className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-white font-bold text-[10px] shrink-0">SD</div>
           <div className="flex-1 min-w-0">
             <div className="text-white text-xs font-semibold truncate">Sipho Dlamini</div>
-            <div className="text-[#A7D7BF] text-[10px] truncate">Owner</div>
+            <div className="text-white/40 text-[10px] truncate">Owner</div>
           </div>
-          <LogOut size={13} className="text-[#A7D7BF] group-hover:text-white shrink-0" />
+          <LogOut size={13} className="text-white/30 group-hover:text-white shrink-0" />
         </div>
       </div>
     </aside>
